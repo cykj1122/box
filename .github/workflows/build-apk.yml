@@ -18,14 +18,28 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: 配置 Gradle 镜像源
+        run: |
+          mkdir -p ~/.gradle
+          echo "
+          allprojects {
+              repositories {
+                  maven { url 'https://maven.aliyun.com/repository/public' }
+                  maven { url 'https://maven.aliyun.com/repository/google' }
+                  mavenCentral()
+                  google()
+              }
+          }
+          " > ~/.gradle/init.gradle
+
       - name: 赋予 Gradle 执行权限
         run: chmod +x gradlew
 
-      - name: 编译 Release APK
-        run: ./gradlew assembleRelease
+      - name: 编译 Debug APK（跳过签名，快速验证）
+        run: ./gradlew assembleDebug
 
       - name: 上传 APK 到 Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tvbox-release-apk
-          path: app/build/outputs/apk/release/*.apk
+          name: tvbox-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
